@@ -85,14 +85,15 @@ class Newsman:
         persona = self.types[type]
         #create system prompt
         self.personality = f"assume the personality of {persona} and roleplay as them."
-    
-        response = openai.ChatCompletion.create(model='gpt-3.5-turbo',
-                                                temperature=.9,
+        try:
+        response = openai.ChatCompletion.create(model=self.model,
+                                                temperature=1,
                                                 messages=({"role": "system", "content": self.personality},
                                                             {"role": "user", "content": message}))
         #return the response text
         response_text = response['choices'][0]['message']['content']
         return response_text.strip()
+        #add error handling later
 
 
     # simplifies sending messages to the channel            
