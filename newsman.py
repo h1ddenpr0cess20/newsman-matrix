@@ -85,7 +85,7 @@ class Newsman:
         persona = self.types[type]
         #create system prompt
         self.personality = f"assume the personality of {persona} and roleplay as them."
-        try:
+        
         response = openai.ChatCompletion.create(model=self.model,
                                                 temperature=1,
                                                 messages=({"role": "system", "content": self.personality},
@@ -160,7 +160,7 @@ class Newsman:
                             #chop it up for irc length 
                             await self.send_message(room_id, report)
                             
-                        elif news == "429":
+                        elif news == 429:
                             await self.send_message(room_id, "try again later")
                         else:
                             await self.send_message(room_id, "error")
@@ -169,8 +169,8 @@ class Newsman:
                     commands = ""
                     #add the rest from types
                     for command in self.types:
-                        commands = commands + command + " "
-                    help_message = f"Newsman, an AI newsroom.\n\nCommands: {commands}\n\nAvailable at https://github.com/h1ddenpr0cess20/newsman-matrix"
+                        commands = commands + f".{command}\n"
+                    help_message = f"Newsman, an AI newsroom.\n\nCommands:\n{commands}\n\nAvailable at https://github.com/h1ddenpr0cess20/newsman-matrix"
                     #send help message as notice
                     await self.send_message(room_id, help_message)
 
