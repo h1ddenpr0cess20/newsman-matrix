@@ -1,6 +1,8 @@
 # newsman-matrix
 An AI news and weather reporter for Matrix chat protocol which reports news by category in the style of a tv news report.  Powered by NewsAPI, WeatherAPI and OpenAI gpt-3.5-turbo.
 
+IRC version available at [newsman-irc](https://github.com/h1ddenpr0cess20/newsman-irc)
+
 ## Setup
 ```
 pip3 install openai matrix-nio
