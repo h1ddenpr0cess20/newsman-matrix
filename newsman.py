@@ -163,10 +163,15 @@ class Newsman:
                             await self.send_message(room_id, "try again later")
                         else:
                             await self.send_message(room_id, "error")
-
-
-
-
+                #help menu
+                if type == "help":
+                    commands = ""
+                    #add the rest from types
+                    for command in self.types:
+                        commands = commands + command + " "
+                    help_message = f"Newsman, an AI newsroom.\n\nCommands: {commands}\n\nAvailable at https://github.com/h1ddenpr0cess20/newsman-matrix"
+                    #send help message as notice
+                    await self.send_message(room_id, help_message)
 
     # main loop
     async def main(self):
@@ -186,7 +191,6 @@ class Newsman:
         self.client.add_event_callback(self.message_callback, RoomMessageText)
                      
         await self.client.sync_forever(timeout=30000)  # milliseconds
-
 
 if __name__ == "__main__":
     openai.api_key = "API_KEY"
