@@ -121,58 +121,59 @@ class Newsman:
             if message_time > self.join_time and sender != self.username:
                 #things to exclude from articles
                 exclude = {None, "[Removed]"}
-                type = message.lstrip(".")
-                if type.startswith("weather"):
-                    if " " in type:
-                        type = type.split(" ",1)
-                        location = type[1]
-                        type = type[0]
-                    else:
-                        location = " "
-                    
-                #check the personality types for a matching news category
-                if type in self.types:
-                    #get weather report
-                    if type == "weather":
-                        #you can tweak the fields the API returns under API Response Fields on the weatherapi website
-                        weather = await self.get_weather(location)
-                        #generate the AI weather report
-                        report = await self.respond(f"report this weather in one paragraph\n{weather}", type)
-                        await self.send_message(room_id, report)
-                    else:            
-                        #create a string for the list of articles
-                        articles = ""
-                        #get the news for the category
-                        if type == "news":
-                            news = await self.get_news()
-                        else:             
-                            news = await self.get_news(type)
-                        
-                        if news != None and news != 429:
-                            #grab a limited amout of headlines and descriptions
-                            #change how this works later by grabbing more articles, filtering the bad ones, then select 5 of them.  current way can result in too few articles being reported.
-                            for article in news[:5]:
-                                if article['title'] in exclude or article['description'] in exclude:
-                                    continue
-                                articles = articles + article['title'] + " - " + article['description'] + "\n\n"
-                            #create AI news report
-                            report = await self.respond(f"summarize these headlines into an entertaining {type} news report.  do not write it like a script. \n{articles}", type)
-                            #chop it up for irc length 
-                            await self.send_message(room_id, report)
-                            
-                        elif news == 429:
-                            await self.send_message(room_id, "try again later")
+                if message.startswith("."):
+                    type = message.lstrip(".")
+                    if type.startswith("weather"):
+                        if " " in type:
+                            type = type.split(" ",1)
+                            location = type[1]
+                            type = type[0]
                         else:
-                            await self.send_message(room_id, "error")
-                #help menu
-                if type == "help":
-                    commands = ""
-                    #add the rest from types
-                    for command in self.types:
-                        commands = commands + f".{command}\n"
-                    help_message = f"Newsman, an AI newsroom.\n\nCommands:\n{commands}\n\nAvailable at https://github.com/h1ddenpr0cess20/newsman-matrix"
-                    #send help message as notice
-                    await self.send_message(room_id, help_message)
+                            location = " "
+                        
+                    #check the personality types for a matching news category
+                    if type in self.types:
+                        #get weather report
+                        if type == "weather":
+                            #you can tweak the fields the API returns under API Response Fields on the weatherapi website
+                            weather = await self.get_weather(location)
+                            #generate the AI weather report
+                            report = await self.respond(f"report this weather in one paragraph\n{weather}", type)
+                            await self.send_message(room_id, report)
+                        else:            
+                            #create a string for the list of articles
+                            articles = ""
+                            #get the news for the category
+                            if type == "news":
+                                news = await self.get_news()
+                            else:             
+                                news = await self.get_news(type)
+                            
+                            if news != None and news != 429:
+                                #grab a limited amout of headlines and descriptions
+                                #change how this works later by grabbing more articles, filtering the bad ones, then select 5 of them.  current way can result in too few articles being reported.
+                                for article in news[:5]:
+                                    if article['title'] in exclude or article['description'] in exclude:
+                                        continue
+                                    articles = articles + article['title'] + " - " + article['description'] + "\n\n"
+                                #create AI news report
+                                report = await self.respond(f"summarize these headlines into an entertaining {type} news report.  do not write it like a script. \n{articles}", type)
+                                #chop it up for irc length 
+                                await self.send_message(room_id, report)
+                                
+                            elif news == 429:
+                                await self.send_message(room_id, "try again later")
+                            else:
+                                await self.send_message(room_id, "error")
+                    #help menu
+                    if type == "help":
+                        commands = ""
+                        #add the rest from types
+                        for command in self.types:
+                            commands = commands + f".{command}\n"
+                        help_message = f"Newsman, an AI newsroom.\n\nCommands:\n{commands}\n\nAvailable at https://github.com/h1ddenpr0cess20/newsman-matrix"
+                        #send help message as notice
+                        await self.send_message(room_id, help_message)
 
     # main loop
     async def main(self):
