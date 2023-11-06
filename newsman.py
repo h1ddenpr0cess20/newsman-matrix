@@ -5,18 +5,19 @@
 import asyncio
 from nio import AsyncClient, MatrixRoom, RoomMessageText
 import datetime
-import openai
+from openai import OpenAI
 import requests
 import namegen
 
 class Newsman:
-    def __init__(self, server, username, password, channels):
+    def __init__(self, server, username, password, channels, api_key):
         self.server = server
         self.username = username
         self.password = password
         self.channels = channels
 
         self.client = AsyncClient(server, username)
+        self.openai = OpenAI(api_key=api_key)
         
         # time program started and joined channels
         self.join_time = datetime.datetime.now()
@@ -86,12 +87,12 @@ class Newsman:
         #create system prompt
         self.personality = f"assume the personality of {persona} and roleplay as them."
         
-        response = openai.ChatCompletion.create(model=self.model,
+        response = self.openai.chat.completions.create(model=self.model,
                                                 temperature=1,
                                                 messages=({"role": "system", "content": self.personality},
                                                             {"role": "user", "content": message}))
         #return the response text
-        response_text = response['choices'][0]['message']['content']
+        response_text = response.choices[0].message.content
         return response_text.strip()
         #add error handling later
 
@@ -195,7 +196,7 @@ class Newsman:
         await self.client.sync_forever(timeout=30000)  # milliseconds
 
 if __name__ == "__main__":
-    openai.api_key = "API_KEY"
+    openai_key = "API_KEY"
     news_api = "API_KEY"
     weather_key = 'API_KEY'
     
@@ -209,7 +210,7 @@ if __name__ == "__main__":
                 "!ExAmPleOfApRivAtErOoM:SERVER.TLD", ] #enter the channels you want it to join here
         
     # create bot instance
-    newsman = Newsman(server, username, password, channels)
+    newsman = Newsman(server, username, password, channels, openai_key)
     
     # run main function loop
     asyncio.get_event_loop().run_until_complete(newsman.main())
